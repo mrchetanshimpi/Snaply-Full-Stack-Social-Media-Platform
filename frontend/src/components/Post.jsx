@@ -9,16 +9,18 @@ import CommentDialog from './CommentDialog'
 import { useDispatch, useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
 import axios from 'axios'
-import { setPosts } from '@/redux/postSlice'
+import { setPosts, setSelectedPost } from '@/redux/postSlice'
+import { Badge } from './ui/badge'
 
 const Post = ({ post }) => {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
+  const [comment, setComment] = useState(post.comments);
   const { user } = useSelector(store => store.auth)
   const { posts } = useSelector(store => store.post)
   const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
   const [postLikes, setPostLikes] = useState(post.likes.length);
-  
+
   const dispatch = useDispatch();
 
 
@@ -50,19 +52,55 @@ const Post = ({ post }) => {
 
   const likeOrDislikeHandler = async () => {
     try {
-      const action = liked? 'dislike' : 'like'
+      const action = liked ? 'dislike' : 'like'
       const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/${action}`, { withCredentials: true });
       if (res?.data?.success) {
-        setPostLikes(liked ? postLikes-1 : postLikes+1);
+        setPostLikes(liked ? postLikes - 1 : postLikes + 1);
         setLiked(!liked);
+
+        const updatedPostData = posts.map((p) =>
+          p._id == post._id ? {
+            ...p,
+            likes: liked ? p.likes.filter((id) => id != user._id) : [...p.likes, user._id]
+          } : p
+        )
+        dispatch(setPosts(updatedPostData));
         toast.success(res.data.message);
         console.log(res.data.message)
       }
-      
+
     }
     catch (error) {
       toast.error(error.response?.data?.message);
       console.log(error);
+    }
+  }
+
+  const commentHandler = async () => {
+    try {
+      const res = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`, { text }, {
+        headers: {
+          "Content-Type": "application/json"
+        },
+        withCredentials: true
+      })
+
+      if (res.data?.success) {
+        toast.success(res.data.message);
+
+        const updatedCommentData = [...comment, res.data.comment]
+        setComment(updatedCommentData)
+
+        const updatedPostData = posts.map((p) =>
+          p._id == post._id ? { ...p, comments: updatedCommentData } : p
+        )
+
+        dispatch(setPosts(updatedPostData));
+        setText("");
+      }
+
+    } catch (error) {
+      console.log(error.message);
     }
   }
 
@@ -75,7 +113,10 @@ const Post = ({ post }) => {
               <AvatarFallback>CN</AvatarFallback>
             </AvatarImage>
           </Avatar>
-          <h1>{post.author?.username}</h1>
+          <div className='flex items-center gap-3'>
+            <h1>{post.author?.username}</h1>
+            {user?._id == post.author._id && <Badge variant='secondary'>Author</Badge>}
+          </div>
         </div>
 
         <Dialog>
@@ -115,7 +156,10 @@ const Post = ({ post }) => {
           }
 
 
-          <MessageCircle onClick={() => setOpen(true)} className='cursor-pointer hover:text-gray-600' />
+          <MessageCircle onClick={() => {
+            dispatch(setSelectedPost(post))
+            setOpen(true);
+          }} className='cursor-pointer hover:text-gray-600' />
           <Send className='cursor-pointer hover:text-gray-600' />
         </div>
         <Bookmark className='cursor-pointer hover:text-gray-600' />
@@ -126,7 +170,17 @@ const Post = ({ post }) => {
         <span className='font-medium mr-2'>{post.author?.username}</span>
         {post.caption}
       </p>
-      <span className='cursor-pointer text-sm text-gray-400' onClick={() => setOpen(true)}>View all 10 comments</span>
+
+      {
+        comment.length > 0 && (
+          <span className='cursor-pointer text-sm text-gray-400'
+            onClick={() => {
+              dispatch(setSelectedPost(post))
+              setOpen(true);
+            }}>View all {comment.length} comments</span>
+        )
+      }
+
       <CommentDialog open={open} setOpen={setOpen} />
       <div className='flex items-center justify-between'>
         <input
@@ -137,7 +191,7 @@ const Post = ({ post }) => {
           className='outline-none text-sm w-full'
         />
         {
-          text ? (<span className='text-[#3BADF8]'>Post</span>) : ("")
+          text ? (<span onClick={commentHandler} className='text-[#3BADF8] cursor-pointer'>Post</span>) : ("")
         }
       </div>
     </div>

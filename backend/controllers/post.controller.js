@@ -156,7 +156,7 @@ module.exports.disLikePost = async (req, res) => {
 module.exports.addComment = async (req, res) => {
     try {
         const postId = req.params.id;
-        const userId = req.user.Id;
+        const userId = req.user.userId;
 
         const { text } = req.body;
 
@@ -171,7 +171,12 @@ module.exports.addComment = async (req, res) => {
             text,
             author: userId,
             post: postId
-        }).populate({ path: 'author', select: 'username, profilePicture' })
+        })
+
+        await comment.populate({ 
+            path: 'author', 
+            select: 'username profilePicture' 
+        })
 
         const post = await postModel.findById(postId);
         post.comments.push(comment._id);
@@ -194,7 +199,7 @@ module.exports.getCommentsOfPost = async (req, res) => {
         const postId = req.params.id;
 
         const comments = await commentModel.find({ post: postId })
-            .populate('author', 'username', 'profilePicture')
+            .populate('author', 'username profilePicture')
 
         if (!comments) {
             return res.status(404).json({
