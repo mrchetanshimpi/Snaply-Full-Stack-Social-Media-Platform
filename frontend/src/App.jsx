@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast'
 import MainContainer from './components/MainContainer'
 import Profile from './components/Profile'
 import Home from './components/Home'
+import ChatPage from './components/ChatPage'
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
           <Route path='/' element={<Home/>}/>
           <Route path='/profile/:id' element={<Profile/>}/>
           <Route path='/account/edit' element={<Profile/>}/>
+          <Route path='/chat' element={<ChatPage/>}/>
 
         </Route>
         
