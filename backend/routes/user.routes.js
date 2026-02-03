@@ -8,7 +8,7 @@ route.post('/register', register);
 route.post('/login', login);
 route.get('/logout', logout);
 route.get('/:id/profile', isAuthenticated, getProfile);
-route.post('/:id/profile/edit', isAuthenticated, upload.single('profilePicture'), editProfile);
+route.post('/:id/profile/edit', isAuthenticated, upload.single('profilePhoto'), editProfile);
 route.get('/suggested', isAuthenticated, getSuggestedUsers);
 route.post('/followOrUnfollow/:id', isAuthenticated, followOrUnfollow);
 

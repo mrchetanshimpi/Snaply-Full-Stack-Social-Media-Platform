@@ -118,8 +118,8 @@ module.exports.logout = async (_, res) => {
 module.exports.getProfile = async (req, res) => {
     try {
         const userId = req.params.id;
-        const user = await userModel.findOne({ _id: userId }).select('-password');
-
+        const user = await userModel.findOne({ _id: userId }).populate({path:'posts',createdAt:-1}).populate('bookmarks');
+        
         return res.status(200).json({
             user,
             success: true

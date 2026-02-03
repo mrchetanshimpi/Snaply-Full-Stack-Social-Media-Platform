@@ -16,7 +16,7 @@ const useGetSuggestedUsers = () => {
                 console.error(error);
             }
         }
-        fetchAllPost();
+        fetchSuggestedUsers();
     },[])
 }
 
