@@ -5,10 +5,8 @@ const connectDB = require('./utils/db');
 const userRouter = require('./routes/user.routes')
 const postRouter = require('./routes/post.routes');
 const messageRouter = require('./routes/message.routes');
-
+const {app, server} = require('./socket/socket');
 require('dotenv').config();
-
-const app = express();
 
 // middlewares
 app.use(express.json());
@@ -29,7 +27,7 @@ app.use('/api/v1/message', messageRouter);
 
 const PORT = process.env.PORT;
 
-app.listen(PORT, ()=>{
+server.listen(PORT, ()=>{
     connectDB();
     console.log(`Server listen at port ${PORT}`)
 })
