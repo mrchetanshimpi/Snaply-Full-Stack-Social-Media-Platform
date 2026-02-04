@@ -8,37 +8,54 @@ import MainContainer from './components/MainContainer'
 import Profile from './components/Profile'
 import Home from './components/Home'
 import ChatPage from './components/ChatPage'
-import {io} from 'socket.io-client'
+import { io } from 'socket.io-client'
 import { useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { setSocket } from './redux/socketSlice'
+import { setOnlineUsers } from './redux/chatSlice'
 
 function App() {
+  const dispatch = useDispatch();
 
-  const {user} = useSelector(store=>store.auth);
-  useEffect(()=>{
-    if(user){
-      const socket = io('http://localhost:8000',{
-        query:{
+  const { user } = useSelector(store => store.auth);
+  useEffect(() => {
+    if (user) {
+      const socketio = io('http://localhost:8000', {
+        query: {
           userId: user?._id
         },
         transports: ['websoket']
+      });
+      dispatch(setSocket(socketio));
+
+      socketio.on('getOnlineUsers', (onlineUsers) => {
+        dispatch(setOnlineUsers(onlineUsers));
       })
-    } 
-  },[])
+
+      return () => {
+        socketio.close();
+        dispatch(setSocket(null));
+      }
+    }
+    else {
+      socketio.close();
+      dispatch(setSocket(null));
+    }
+  }, [user, dispatch])
 
   return (
     <>
       <Routes>
-        <Route path='/register' element={<Signup/>} />
-        <Route path='/login' element={<Login/>} />
-        <Route path='/' element={<MainContainer/>}>
-          <Route path='/' element={<Home/>}/>
-          <Route path='/profile/:id' element={<Profile/>}/>
-          <Route path='/account/edit' element={<Profile/>}/>
-          <Route path='/chat' element={<ChatPage/>}/>
+        <Route path='/register' element={<Signup />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/' element={<MainContainer />}>
+          <Route path='/' element={<Home />} />
+          <Route path='/profile/:id' element={<Profile />} />
+          <Route path='/account/edit' element={<Profile />} />
+          <Route path='/chat' element={<ChatPage />} />
 
         </Route>
-        
+
       </Routes>
     </>
   )
