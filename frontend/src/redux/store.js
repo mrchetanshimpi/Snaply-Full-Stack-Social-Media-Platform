@@ -3,6 +3,7 @@ import authSlice from './authSlice'
 import postSlice from './postSlice'
 import socketSlice from './socketSlice'
 import chatSlice from './chatSlice';
+import rtnSlice from './rtnSlice';
 
 const store = configureStore({
     reducer:{
@@ -10,6 +11,7 @@ const store = configureStore({
         post:postSlice,
         socket:socketSlice,
         chat:chatSlice,
+        realTimeNotification:rtnSlice
     }
 });
 

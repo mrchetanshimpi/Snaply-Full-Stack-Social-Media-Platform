@@ -13,9 +13,11 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSocket } from './redux/socketSlice'
 import { setOnlineUsers } from './redux/chatSlice'
+import { setLikeNotification } from './redux/rtnSlice'
 
 function App() {
   const dispatch = useDispatch();
+  const { socket } = useSelector(store=>store.socket)
 
   const { user } = useSelector(store => store.auth);
   useEffect(() => {
@@ -32,13 +34,17 @@ function App() {
         dispatch(setOnlineUsers(onlineUsers));
       })
 
+      socketio.on('notification', (notification)=>{
+        dispatch(setLikeNotification(notification));
+      })
+
       return () => {
         socketio.close();
         dispatch(setSocket(null));
       }
     }
     else {
-      socketio.close();
+      socket.close();
       dispatch(setSocket(null));
     }
   }, [user, dispatch])

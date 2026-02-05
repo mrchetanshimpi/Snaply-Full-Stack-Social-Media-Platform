@@ -1,5 +1,6 @@
 const conversationModel = require("../models/conversation.model");
 const messageModel = require("../models/message.model");
+const { getReceiverSocketId, io } = require("../socket/socket");
 
 
 module.exports.sendMessage = async (req, res) => {
@@ -7,7 +8,7 @@ module.exports.sendMessage = async (req, res) => {
         const senderId = req.user.userId;
         const receiverId = req.params.id;
 
-        const { message } = req.body;
+        const { textMessage : message } = req.body;
 
         const conversation = await conversationModel.findOne({ participants: { $all: [senderId, receiverId] } });
 
@@ -28,6 +29,10 @@ module.exports.sendMessage = async (req, res) => {
         await Promise.all([conversation.save(), newMessage.save()])
 
         // Implement socket io for real time data transfer
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if(receiverSocketId) {
+            io.to(receiverSocketId).emit('newMessage', newMessage);
+        }
 
         return res.status(201).json({
             success: true,
@@ -44,9 +49,9 @@ module.exports.getMessages = async (req, res) => {
         const senderId = req.user.userId;
         const receiverId = req.params.id;
 
-        const conversation = await conversationModel.find({
+        const conversation = await conversationModel.findOne({
             participants: { $all: [senderId, receiverId] }
-        })
+        }).populate('messages')
 
         if (!conversation) {
             return res.status(200).json({

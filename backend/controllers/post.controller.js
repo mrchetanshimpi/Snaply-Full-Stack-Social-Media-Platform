@@ -1,6 +1,7 @@
 const commentModel = require('../models/comment.model');
 const postModel = require('../models/post.model');
 const userModel = require('../models/user.model');
+const { getReceiverSocketId, io } = require('../socket/socket');
 const cloudinary = require("../utils/cloudinary.cjs");
 const sharp = require('sharp');
 
@@ -33,7 +34,7 @@ module.exports.addNewPost = async (req, res) => {
         })
 
         const user = await userModel.findById(userId);
-        if(user) {
+        if (user) {
             user.posts.push(post._id);
             await user.save();
         }
@@ -113,6 +114,20 @@ module.exports.likePost = async (req, res) => {
         await post.save();
 
         // Implement Socketio for real time notification
+        const user = await userModel.findById(userId).select('username profilePicture');
+        const postOwnerId = post.author.toString();
+        if (postOwnerId != userId) {
+            // emit a notification event
+            const notification = {
+                type: 'Like',
+                userId: userId,
+                userDetails: user,
+                postId,
+                message: "Your post was liked"
+            }
+            const postOwnerSocketId = getReceiverSocketId(postOwnerId);
+            io.to(postOwnerSocketId).emit('notification', notification);
+        }
 
         return res.status(200).json({
             message: 'Post liked',
@@ -143,6 +158,21 @@ module.exports.disLikePost = async (req, res) => {
 
         // Implement Socketio for real time notification
 
+        const user = await userModel.findById(userId).select('username profilePicture');
+        const postOwnerId = post.author.toString();
+        if (postOwnerId != userId) {
+            // emit a notification event
+            const notification = {
+                type: 'dislike',
+                userId: userId,
+                userDetails: user,
+                postId,
+                message: "Your post was Disliked"
+            }
+            const postOwnerSocketId = getReceiverSocketId(postOwnerId);
+            io.to(postOwnerSocketId).emit('notification', notification);
+        }
+        
         return res.status(200).json({
             message: 'Post disLiked',
             success: true
@@ -173,9 +203,9 @@ module.exports.addComment = async (req, res) => {
             post: postId
         })
 
-        await comment.populate({ 
-            path: 'author', 
-            select: 'username profilePicture' 
+        await comment.populate({
+            path: 'author',
+            select: 'username profilePicture'
         })
 
         const post = await postModel.findById(postId);
