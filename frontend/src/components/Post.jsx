@@ -104,6 +104,19 @@ const Post = ({ post }) => {
     }
   }
 
+  let bookm = false;
+  const bookMarkHandler = async () => {
+    try {
+      const res = await axios.get(`http://localhost:8000/api/v1/post/${post?._id}/bookmark`, { withCredentials: true });
+      if (res.data?.success) {
+        toast.success(res.data.message);
+        bookm ? bookm=false : bookm=true;
+      }
+    } catch (error) {
+
+    }
+  }
+
   return (
     <div className='my-8 w-full max-w-sm mx-auto'>
       <div className='flex items-center justify-between'>
@@ -124,7 +137,10 @@ const Post = ({ post }) => {
             <MoreHorizontal className='cursor-pointer' />
           </DialogTrigger>
           <DialogContent className='flex flex-col items-center text-sm text-center'>
-            <Button variant='ghost' className='cursor-pointer w-fit text-[#ED4956] font-bold'>Unfollow</Button>
+            {
+              post?.author?._id != user?._id && <Button variant='ghost' className='cursor-pointer w-fit text-[#ED4956] font-bold'>Unfollow</Button>
+            }
+
             <Button variant='ghost' className='cursor-pointer w-fit'>Add to favorites</Button>
 
             {
@@ -162,7 +178,7 @@ const Post = ({ post }) => {
           }} className='cursor-pointer hover:text-gray-600' />
           <Send className='cursor-pointer hover:text-gray-600' />
         </div>
-        <Bookmark className='cursor-pointer hover:text-gray-600' />
+        <Bookmark onClick={bookMarkHandler} className={`cursor-pointer hover:text-gray-600 ${bookm? 'bg-black':'bg-white'}`} />
       </div>
 
       <span className='font-medium block mb-2'>{postLikes} likes</span>

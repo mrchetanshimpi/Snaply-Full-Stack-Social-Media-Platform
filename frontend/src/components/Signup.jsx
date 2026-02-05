@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import axios from 'axios'
@@ -6,24 +6,26 @@ import instalogo2 from '../assets/instalogo2.png'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const Signup = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState({
+    const [input, setInput] = useState({
         username: "",
         email: "",
         password: "",
     });
+    const { user } = useSelector(store=>store.auth);
 
     const submitHandler = async (e) => {
         e.preventDefault();
-        if (!user.username || !user.email || !user.password) {
+        if (!input.username || !input.email || !input.password) {
             toast.error("All fields are required");
             return;
         }
         try {
             // setLoading(true);
-            const res = await axios.post('http://localhost:8000/api/v1/user/register', user, {
+            const res = await axios.post('http://localhost:8000/api/v1/user/register', input, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -45,6 +47,12 @@ const Signup = () => {
         }
     }
 
+    useEffect(()=>{
+        if(user){
+            navigate('/')
+        }
+    },[])
+
     return (
         <div className='flex items-center w-screen h-screen justify-center'>
             <form className='shadow-lg flex flex-col gap-2 p-8' onSubmit={submitHandler}>
@@ -59,9 +67,9 @@ const Signup = () => {
                         className='focus-visible:ring-transparent my-2'
                         name='username'
                         onChange={(e) => {
-                            setUser({ ...user, username: e.target.value });
+                            setInput({ ...input, username: e.target.value });
                         }}
-                        value={user.username}
+                        value={input.username}
                     />
                 </div>
                 <div>
@@ -71,9 +79,9 @@ const Signup = () => {
                         className='focus-visible:ring-transparent my-2'
                         name='email'
                         onChange={(e) => {
-                            setUser({ ...user, email: e.target.value });
+                            setInput({ ...input, email: e.target.value });
                         }}
-                        value={user.email}
+                        value={input.email}
                     />
                 </div>
                 <div>
@@ -83,9 +91,9 @@ const Signup = () => {
                         className='focus-visible:ring-transparent my-2'
                         name='password'
                         onChange={(e) => {
-                            setUser({ ...user, password: e.target.value });
+                            setInput({ ...input, password: e.target.value });
                         }}
-                        value={user.password}
+                        value={input.password}
                     />
                 </div>
                 {

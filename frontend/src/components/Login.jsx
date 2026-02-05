@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import axios from 'axios'
@@ -6,28 +6,29 @@ import instalogo2 from '../assets/instalogo2.png'
 import toast from 'react-hot-toast'
 import { Loader, Loader2 } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setAuthUser } from '../redux/authSlice'
 
 const Login = () => {
-    const [user, setUser] = useState({
+    const [input, setInput] = useState({
         email: "",
         password: "",
     });
 
+    const { user } = useSelector(store=>store.auth);
     // const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const submitHandler = async (e) => {
         e.preventDefault();
-        if (!user.email || !user.password) {
+        if (!input.email || !input.password) {
             toast.error("All fields are required");
             return;
         }
         try {
             // setLoading(true);
-            const res = await axios.post('http://localhost:8000/api/v1/user/login', user, {
+            const res = await axios.post('http://localhost:8000/api/v1/user/login', input, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -52,6 +53,12 @@ const Login = () => {
         // }
     }
 
+    useEffect(()=>{
+        if(user){
+            navigate('/')
+        }
+    },[])
+
     return (
         <div className='flex items-center w-screen h-screen justify-center'>
             <form className='shadow-lg flex flex-col gap-3 p-8' onSubmit={submitHandler}>
@@ -66,9 +73,9 @@ const Login = () => {
                         className='focus-visible:ring-transparent my-2'
                         name='email'
                         onChange={(e) => {
-                            setUser({ ...user, email: e.target.value });
+                            setInput({ ...input, email: e.target.value });
                         }}
-                        value={user.email}
+                        value={input.email}
                     />
                 </div>
                 <div>
@@ -78,9 +85,9 @@ const Login = () => {
                         className='focus-visible:ring-transparent my-2'
                         name='password'
                         onChange={(e) => {
-                            setUser({ ...user, password: e.target.value });
+                            setInput({ ...input, password: e.target.value });
                         }}
-                        value={user.password}
+                        value={input.password}
                     />
                 </div>
                 {

@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setSocket } from './redux/socketSlice'
 import { setOnlineUsers } from './redux/chatSlice'
 import { setLikeNotification } from './redux/rtnSlice'
+import ProtectedRoutes from './components/ProtectedRoutes'
+import EditProfile from './components/EditProfile'
 
 function App() {
   const dispatch = useDispatch();
@@ -54,14 +56,12 @@ function App() {
       <Routes>
         <Route path='/register' element={<Signup />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/' element={<MainContainer />}>
-          <Route path='/' element={<Home />} />
-          <Route path='/profile/:id' element={<Profile />} />
-          <Route path='/account/edit' element={<Profile />} />
-          <Route path='/chat' element={<ChatPage />} />
-
+        <Route path='/' element={<ProtectedRoutes><MainContainer /></ProtectedRoutes>}>
+          <Route path='/' element={<ProtectedRoutes><Home /></ProtectedRoutes>} />
+          <Route path='/profile/:id' element={<ProtectedRoutes><Profile /></ProtectedRoutes>} />
+          <Route path='/account/edit' element={<ProtectedRoutes><EditProfile /></ProtectedRoutes>} />
+          <Route path='/chat' element={<ProtectedRoutes><ChatPage /></ProtectedRoutes>} />
         </Route>
-
       </Routes>
     </>
   )
