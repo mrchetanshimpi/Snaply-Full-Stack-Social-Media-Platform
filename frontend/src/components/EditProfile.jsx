@@ -43,7 +43,7 @@ const EditProfile = () => {
 
         try {
             setLoading(true);
-            const res = await axios.post('http://localhost:8000/api/v1/user/profile/edit', formData, {
+            const res = await axios.post(`http://localhost:8000/api/v1/user/${user._id}/profile/edit`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
@@ -75,9 +75,8 @@ const EditProfile = () => {
                 <div className='flex items-center justify-between bg-gray-100 rounded-xl p-4'>
                     <div className='flex items-center gap-3'>
                         <Avatar>
-                            <AvatarImage src={user?.profilePicture} alt="post_image">
-                                <AvatarFallback>CN</AvatarFallback>
-                            </AvatarImage>
+                            <AvatarImage src={user?.profilePicture} alt="post_image"/>
+                            <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
 
                         <div>

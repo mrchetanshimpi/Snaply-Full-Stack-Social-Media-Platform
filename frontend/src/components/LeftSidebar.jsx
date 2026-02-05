@@ -65,7 +65,7 @@ const LeftSidebar = () => {
         icon: (
             <Avatar className='h-6 w-6'>
                 <AvatarImage src={user?.profilePicture} />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>{user?.username?.slice(0,2).toUpperCase() || "CN"}</AvatarFallback>
             </Avatar>
         ),
         text: 'Profile'

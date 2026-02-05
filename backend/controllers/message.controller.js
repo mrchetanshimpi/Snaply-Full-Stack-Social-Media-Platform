@@ -8,7 +8,7 @@ module.exports.sendMessage = async (req, res) => {
         const senderId = req.user.userId;
         const receiverId = req.params.id;
 
-        const { textMessage : message } = req.body;
+        const { textMessage : text } = req.body;
 
         const conversation = await conversationModel.findOne({ participants: { $all: [senderId, receiverId] } });
 

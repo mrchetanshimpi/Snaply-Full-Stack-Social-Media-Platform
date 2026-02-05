@@ -17,8 +17,8 @@ const CreatePost = ({ open, setOpen }) => {
     const [caption, setCaption] = useState("")
     const [imgPreview, setImgPreview] = useState("")
     const [loading, setLoading] = useState(false);
-    const {user} = useSelector(store=>store.auth);
-    const {posts} = useSelector(store=>store.post);
+    const { user } = useSelector(store => store.auth);
+    const { posts } = useSelector(store => store.post);
     const dispatch = useDispatch();
 
     const fileChangeHandler = async (e) => {

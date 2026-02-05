@@ -33,7 +33,7 @@ const Signup = () => {
             })
             if (res.data.success) {
                 toast.success(res.data.message);
-                setUser({
+                setInput({
                     username: "",
                     email: "",
                     password: "",

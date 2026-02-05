@@ -122,9 +122,8 @@ const Post = ({ post }) => {
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2'>
           <Avatar>
-            <AvatarImage src={post.author?.profilePicture} alt="post_image">
+            <AvatarImage src={post.author?.profilePicture} alt="post_image"/>
               <AvatarFallback>CN</AvatarFallback>
-            </AvatarImage>
           </Avatar>
           <div className='flex items-center gap-3'>
             <h1>{post.author?.username}</h1>

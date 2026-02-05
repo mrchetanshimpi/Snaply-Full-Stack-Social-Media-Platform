@@ -9,7 +9,7 @@ import Messages from './Messages';
 import axios from 'axios';
 import { setMessages } from '@/redux/chatSlice';
 
-const ChatPage = () => {
+const ChatPage = ({socket}) => {
     const [ textMessage, setTextMessage ] = useState("");
     const { user, suggestedUsers, selectedUser } = useSelector(store => store.auth);
     const { onlineUsers, messages } = useSelector(store => store.chat);
@@ -47,7 +47,7 @@ const ChatPage = () => {
                         suggestedUsers?.map((suggestedUser) => {
                             const isOnline = onlineUsers.includes(suggestedUser?._id);
                             return (
-                                <div onClick={() => dispatch(setSelectedUser(suggestedUser))} key={user.id} className='flex gap-3 items-center p-3 hover:bg-gray-50 cursor-pointer'>
+                                <div onClick={() => dispatch(setSelectedUser(suggestedUser))} key={suggestedUser._id} className='flex gap-3 items-center p-3 hover:bg-gray-50 cursor-pointer'>
                                     <Avatar className='w-14 h-14'>
                                         <AvatarImage src={suggestedUser?.profilePicture} />
                                         <AvatarFallback>CN</AvatarFallback>
@@ -75,7 +75,7 @@ const ChatPage = () => {
                             </div>
                         </div>
 
-                        <Messages selectedUser = {selectedUser}/>
+                        <Messages socket={socket}  selectedUser = {selectedUser}/>
                         
                         <div className='flex items-center p-4 border-t border-t-gray-300'>
                             <Input value={textMessage} onChange={(e) => setTextMessage(e.target.value)} type='text' className='flex-1 mr-2 focus-visible:ring-transparent' placeholder='Messages...' />

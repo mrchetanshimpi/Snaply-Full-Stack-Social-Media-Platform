@@ -1,3 +1,4 @@
+import { setMessages } from '@/redux/chatSlice';
 import { setPosts } from '@/redux/postSlice';
 import axios from 'axios'
 import React, { useEffect } from 'react'

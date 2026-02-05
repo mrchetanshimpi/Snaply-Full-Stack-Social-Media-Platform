@@ -2,12 +2,13 @@ import { setMessages } from '@/redux/chatSlice';
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-const useGetRTM = () => {
+const useGetRTM = (socket) => {
     const dispatch = useDispatch();
-    const {socket} = useSelector(store=>store.socket);
     const {messages} = useSelector(store=>store.chat);
     
     useEffect(() => {
+        if (!socket) return; 
+
         socket?.on('newMessage', (newMessage)=>{
             dispatch(setMessages([...messages, newMessage]))
         })
@@ -15,7 +16,8 @@ const useGetRTM = () => {
         return ()=>{
             socket?.off('newMessage');
         }
-    },[messages, setMessages])
+
+    },[messages, dispatch, socket])
 }
 
 export default useGetRTM

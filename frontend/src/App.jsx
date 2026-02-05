@@ -9,7 +9,7 @@ import Profile from './components/Profile'
 import Home from './components/Home'
 import ChatPage from './components/ChatPage'
 import { io } from 'socket.io-client'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSocket } from './redux/socketSlice'
 import { setOnlineUsers } from './redux/chatSlice'
@@ -19,36 +19,34 @@ import EditProfile from './components/EditProfile'
 
 function App() {
   const dispatch = useDispatch();
-  const { socket } = useSelector(store=>store.socket)
-
+  
   const { user } = useSelector(store => store.auth);
+  const socketRef = useRef(null);
+  
   useEffect(() => {
-    if (user) {
+    if (user && !socketRef.current) {
       const socketio = io('http://localhost:8000', {
         query: {
           userId: user?._id
         },
-        transports: ['websoket']
+        transports: ['websocket']
       });
-      dispatch(setSocket(socketio));
+      socketRef.current = socketio; 
 
       socketio.on('getOnlineUsers', (onlineUsers) => {
         dispatch(setOnlineUsers(onlineUsers));
       })
 
-      socketio.on('notification', (notification)=>{
+      socketio.on('notification', (notification) => {
         dispatch(setLikeNotification(notification));
       })
 
       return () => {
-        socketio.close();
-        dispatch(setSocket(null));
-      }
+        socketio.disconnect();
+        socketRef.current = null;
+      };
     }
-    else {
-      socket.close();
-      dispatch(setSocket(null));
-    }
+  
   }, [user, dispatch])
 
   return (
@@ -60,7 +58,7 @@ function App() {
           <Route path='/' element={<ProtectedRoutes><Home /></ProtectedRoutes>} />
           <Route path='/profile/:id' element={<ProtectedRoutes><Profile /></ProtectedRoutes>} />
           <Route path='/account/edit' element={<ProtectedRoutes><EditProfile /></ProtectedRoutes>} />
-          <Route path='/chat' element={<ProtectedRoutes><ChatPage /></ProtectedRoutes>} />
+          <Route path='/chat' element={<ProtectedRoutes><ChatPage socket={socketRef.current} /></ProtectedRoutes>} />
         </Route>
       </Routes>
     </>

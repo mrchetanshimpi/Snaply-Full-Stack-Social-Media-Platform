@@ -6,8 +6,8 @@ import { useSelector } from 'react-redux'
 import useGetAllMessages from '@/hooks/useGetAllMessages'
 import useGetRTM from '@/hooks/useGetRTM'
 
-const Messages = ({ selectedUser }) => {
-    useGetRTM();
+const Messages = ({ selectedUser, socket }) => {
+    useGetRTM(socket);
     useGetAllMessages();
     const {messages} = useSelector(store=>store.chat);
     const {user} = useSelector(store=>store.auth);
@@ -25,9 +25,9 @@ const Messages = ({ selectedUser }) => {
             </div>
             <div className='flex flex-col gap-3'>
                 {
-                    messages && messages.map((msg) => {
+                    messages && messages.map((msg,idx) => {
                         return (
-                            <div className={`flex ${msg.senderId == user?._id ? 'justify-end' : 'justify-start'}`}>
+                            <div key={idx} className={`flex ${msg.senderId == user?._id ? 'justify-end' : 'justify-start'}`}>
                                 <div className={`p-2 rounded max-w-xs wrap-break-word ${msg.senderId == user?._id ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'}`}> 
                                     {msg.message}
                                 </div>

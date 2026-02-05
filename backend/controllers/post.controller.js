@@ -54,8 +54,8 @@ module.exports.addNewPost = async (req, res) => {
 
 module.exports.getAllPosts = async (req, res) => {
     try {
-        const post = await postModel.find().sort({ createdAt: -1 })
-            .populate({ path: 'author', select: 'username profileicture' })
+        const posts = await postModel.find().sort({ createdAt: -1 })
+            .populate({ path: 'author', select: 'username profilePicture' })
             .populate({
                 path: 'comments',
                 sort: { createdAt: -1 },
@@ -66,7 +66,7 @@ module.exports.getAllPosts = async (req, res) => {
             })
 
         return res.status(200).json({
-            post,
+            posts,
             success: true
         })
     }
@@ -80,16 +80,21 @@ module.exports.getUserPost = async (req, res) => {
         const authorId = req.user.userId;
 
         const posts = await postModel.find({ author: authorId })
-            .populate({ path: 'author', select: 'username, profilePicture' })
+            .populate({ path: 'author', select: 'username profilePicture' })
             .populate({
                 path: 'comments',
                 sort: { createdAt: -1 },
                 populate: {
                     path: 'author',
-                    select: 'username, profilePicture',
+                    select: 'username profilePicture',
                     sort: { createdAt: -1 }
                 }
-            });
+        });
+
+        return res.status(200).json({
+            posts,
+            success: true
+        })
     }
     catch (err) {
         console.log(err.message);
