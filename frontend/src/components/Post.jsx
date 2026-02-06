@@ -16,10 +16,12 @@ const Post = ({ post }) => {
   const [text, setText] = useState("");
   const [open, setOpen] = useState(false);
   const [comment, setComment] = useState(post.comments);
+
   const { user } = useSelector(store => store.auth)
   const { posts } = useSelector(store => store.post)
   const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
   const [postLikes, setPostLikes] = useState(post.likes.length);
+  const [bookm, setBookm] = useState(user.bookmarks?.includes(post?._id) || false);
 
   const dispatch = useDispatch();
 
@@ -104,16 +106,16 @@ const Post = ({ post }) => {
     }
   }
 
-  let bookm = false;
   const bookMarkHandler = async () => {
     try {
       const res = await axios.get(`http://localhost:8000/api/v1/post/${post?._id}/bookmark`, { withCredentials: true });
+      
       if (res.data?.success) {
         toast.success(res.data.message);
-        bookm ? bookm=false : bookm=true;
+        bookm ? setBookm(false) : setBookm(true);
       }
     } catch (error) {
-
+      console.log(error);
     }
   }
 
@@ -177,7 +179,7 @@ const Post = ({ post }) => {
           }} className='cursor-pointer hover:text-gray-600' />
           <Send className='cursor-pointer hover:text-gray-600' />
         </div>
-        <Bookmark onClick={bookMarkHandler} className={`cursor-pointer hover:text-gray-600 ${bookm? 'bg-black':'bg-white'}`} />
+        <Bookmark size={27} onClick={bookMarkHandler} className={`cursor-pointer`} fill={bookm ? "#000000" : "none"} />
       </div>
 
       <span className='font-medium block mb-2'>{postLikes} likes</span>

@@ -10,14 +10,22 @@ const Home = () => {
   useGetSuggestedUsers();
   
   return (
-    <div className='flex'>
-      <div className='grow'>
-        <Feed/>
-        <Outlet/>
+    <div className="flex justify-between w-full">
+
+      <div className="flex-1 flex justify-center">
+        <div className="w-full max-w-157.5">
+          <Feed />
+          <Outlet />
+        </div>
       </div>
-      <RightSidebar/>
+
+      <div className="hidden lg:block w-125 pr-10">
+        <RightSidebar />
+      </div>
+
     </div>
   )
+
 }
 
 export default Home

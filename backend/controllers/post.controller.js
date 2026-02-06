@@ -299,6 +299,7 @@ module.exports.bookMarkPost = async (req, res) => {
         const postId = req.params.id;
 
         const post = await postModel.findById(postId);
+        const user = await userModel.findById(authorId);
 
         if (!post) {
             return res.status(404).json({
@@ -316,7 +317,7 @@ module.exports.bookMarkPost = async (req, res) => {
 
             return res.status(200).json({
                 type: 'unsaved',
-                message: 'Post removed from bookmard',
+                message: 'Post removed from bookmarked',
                 success: true
             })
         } else {
