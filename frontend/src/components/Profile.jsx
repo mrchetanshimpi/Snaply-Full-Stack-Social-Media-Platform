@@ -1,34 +1,61 @@
 import React, { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import useGetUserProfile from '@/hooks/useGetUserProfile'
-import { Link, useParams } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { AtSign, Heart, MessageCircle } from 'lucide-react'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+import { setAuthUser, setUserCopy } from '@/redux/authSlice'
 
 const Profile = () => {
+  
   const params = useParams();
   const userId = params.id;
   useGetUserProfile(userId);
   const [activeTab, setActiveTab] = useState('posts');
+  const navigate = useNavigate();
 
-  const { userProfile, user } = useSelector(store => store.auth);
+  const { userProfile, user} = useSelector(store => store.auth);
+  const { followNotification } = useSelector(store => store.realTimeNotification);
+  
+
+  const [isFollowing, setIsFollowing] = useState(user?.followers.includes(userProfile?._id));
+  
+  const dispatch = useDispatch();
 
   const isLoggedinUserProfile = user?._id == userProfile?._id;
-  const isFollowing = false;
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   }
-  const displayedPost = activeTab == 'posts' ? userProfile?.posts : userProfile?.bookmarks
+  const displayedPost = activeTab == 'posts' ? userProfile?.posts : userProfile?.bookmarks;
+
+  const followOrUnfollowHandler = async (userProfile) => {
+    
+    try{
+      const res = await axios.get(`http://localhost:8000/api/v1/user/followOrUnfollow/${userProfile._id}`,{withCredentials:true});
+      if(res?.data.success){
+        setIsFollowing(!isFollowing);
+      }
+    }catch(error){
+      console.log(error)
+    }
+  }
+
+
+  const messageHandler = async () => {
+    navigate(`/chat`)
+  }
   // const displayedPost = userProfile?.posts;
   return (
     <div className='flex max-w-5xl justify-center mx-auto pl-10'>
       <div className='flex flex-col gap-20 p-8'>
         <div className='grid grid-cols-2'>
           <section className='flex items-center justify-center'>
-            <Avatar className='h-32 w-32'>
+            <Avatar className='h-45 w-45'>
               <AvatarImage src={userProfile?.profilePicture} alt='profilephoto' />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
@@ -47,26 +74,26 @@ const Profile = () => {
                   ) : (
                     isFollowing ? (
                       <>
-                        <Button variant='secondary' className='h-8'>Unfollow</Button>
-                        <Button variant='secondary' className='h-8'>Message</Button>
+                        <Button variant='secondary' onClick={()=>followOrUnfollowHandler(userProfile)} className='h-8 ml-5 cursor-pointer'>Unfollow</Button>
+                        <Button variant='secondary' onClick={messageHandler} className='h-8 ml-2 cursor-pointer'>Message</Button>
                       </>
                     ) : (
-                      <Button className='bg-[#0095F6] hover:bg-[#3192d2] h-8'>Follow</Button>
+                      <Button onClick={()=>followOrUnfollowHandler(userProfile)} className='bg-[#0095F6] hover:bg-[#3192d2] h-8 ml-5 cursor-pointer'>Follow</Button>
                     )
                   )
                 }
               </div>
               <div className='flex items-center gap-4'>
                 <p><span className='font-semibold'>{userProfile?.posts.length} </span>posts</p>
-                <p><span className='font-semibold'>{userProfile?.followers.length} </span>followers</p>
+                <p><span className='font-semibold'>{followNotification.length} </span>followers</p>
                 <p><span className='font-semibold'>{userProfile?.following.length} </span>following</p>
               </div>
               <div className='flex flex-col gap-1'>
                 <span className='font-semibold'>{userProfile?.bio || 'bio here...'}</span>
                 <Badge className='w-fit' variant='secondary'><AtSign /><span className='pl-1'>{userProfile?.username}</span></Badge>
-                <span>Learn code with chetan</span>
-                <span>Turning code into fun</span>
-                <span>Dm for collaboration</span>
+                <span className='text-sm mt-2'>Sharing moments, one photo at a time 📸</span>
+                <span className='text-sm'>Living life, loving vibes ❤️</span>
+                <span className='text-sm'>#LifeCaptured</span>
               </div>
             </div>
           </section>
@@ -85,10 +112,9 @@ const Profile = () => {
           <div className='grid grid-cols-3 gap-1 ml-10'>
             {
               displayedPost?.map((post) => {
-                console.log(post)
                 return (
                   <div key={post?._id} className=' relative group cursor-pointer'>
-                    <img src={post.image} alt="postimage" className='rounded-sm w-full aspect-square object-cover' />
+                    <img src={post?.image} alt="postimage" className='rounded-sm w-full aspect-square object-cover' />
                     <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 opacity-0 group-hover:opacity-60 rounded-sm transition-opacity duration-300'>
                       <div className='flex items-center text-white space-x-4'>
                         <button className='flex items-center gap-2 hover:text-gray-300'>

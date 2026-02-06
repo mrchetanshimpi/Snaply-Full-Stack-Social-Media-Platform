@@ -124,7 +124,7 @@ module.exports.likePost = async (req, res) => {
         if (postOwnerId != userId) {
             // emit a notification event
             const notification = {
-                type: 'Like',
+                type: 'like',
                 userId: userId,
                 userDetails: user,
                 postId,

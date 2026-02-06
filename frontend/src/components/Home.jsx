@@ -12,7 +12,7 @@ const Home = () => {
   return (
     <div className="flex justify-between w-full">
 
-      <div className="flex-1 flex justify-center">
+      <div className="flex-1 flex justify-center ">
         <div className="w-full max-w-157.5">
           <Feed />
           <Outlet />

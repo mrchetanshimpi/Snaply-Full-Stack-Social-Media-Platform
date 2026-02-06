@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const getDataUri = require("../utils/datauri");
 const cloudinary = require("../utils/cloudinary.cjs");
 const postModel = require("../models/post.model");
+const { getReceiverSocketId, io } = require("../socket/socket");
 
 module.exports.register = async (req, res) => {
     try {
@@ -87,7 +88,7 @@ module.exports.login = async (req, res) => {
             email: user.email,
             picture: user.profilePicture,
             bio: user.bio,
-            follwers: user.followers,
+            followers: user.followers,
             following: user.following,
             posts: populatedPost
         }
@@ -210,6 +211,11 @@ module.exports.followOrUnfollow = async (req, res) => {
         }
 
         const isFollowing = user.following.includes(followerId);
+
+        
+        const ownerSocketId = getReceiverSocketId(userId);
+        const ReceiverSocketId = getReceiverSocketId(followerId);
+        
         if (isFollowing) {
             // unfollow logic
             await Promise.all([
@@ -217,9 +223,17 @@ module.exports.followOrUnfollow = async (req, res) => {
                 userModel.updateOne({ _id: followerId }, { $pull: { followers: userId } })
             ])
 
+            const follownotification = {
+                type:'unfollow',
+                userId : userId,
+                followerId : followerId
+            }
+
+            io.to(ownerSocketId).emit('follownotification',follownotification)
+
             return res.status(200).json({
                 message: 'Unfollow successfully',
-                success: true
+                success: true,
             })
         } else {
             // follow logic
@@ -228,9 +242,18 @@ module.exports.followOrUnfollow = async (req, res) => {
                 userModel.updateOne({ _id: followerId }, { $push: { followers: userId } })
             ])
 
+
+            const follownotification = {
+                type:'follow',
+                userId : userId,
+                followerId : followerId
+            }
+
+            io.to(ownerSocketId).emit('follownotification',follownotification)
+
             return res.status(200).json({
                 message: 'Follow successfully',
-                success: true
+                success: true,
             })
         }
     }

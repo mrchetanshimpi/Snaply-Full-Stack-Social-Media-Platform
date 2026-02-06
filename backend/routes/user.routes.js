@@ -10,7 +10,7 @@ route.get('/logout', logout);
 route.get('/:id/profile', isAuthenticated, getProfile);
 route.post('/:id/profile/edit', isAuthenticated, upload.single('profilePhoto'), editProfile);
 route.get('/suggested', isAuthenticated, getSuggestedUsers);
-route.post('/followOrUnfollow/:id', isAuthenticated, followOrUnfollow);
+route.get('/followOrUnfollow/:id', isAuthenticated, followOrUnfollow);
 
 module.exports = route;
 

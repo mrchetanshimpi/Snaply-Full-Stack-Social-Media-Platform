@@ -67,7 +67,6 @@ const Post = ({ post }) => {
           } : p
         )
         dispatch(setPosts(updatedPostData));
-        toast.success(res.data.message);
         console.log(res.data.message)
       }
 

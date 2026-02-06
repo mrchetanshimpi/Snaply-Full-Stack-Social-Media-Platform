@@ -11,4 +11,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+  allowedHosts: [
+    'nonarithmetical-immature-antonia.ngrok-free.dev'
+  ]
+}
 })

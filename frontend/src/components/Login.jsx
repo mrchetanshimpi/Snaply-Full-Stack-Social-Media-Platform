@@ -63,7 +63,7 @@ const Login = () => {
         <div className='flex items-center w-screen h-screen justify-center'>
             <form className='shadow-lg flex flex-col gap-3 p-8' onSubmit={submitHandler}>
                 <div className='my-4 flex flex-col items-center'>
-                    <img src={instalogo2} alt="" className='h-14 w-38' />
+                    <img src={instalogo2} alt="" className='h-18 w-36' />
                     <p className='text-sm text-center'>Signup to see photos & videos from your freinds</p>
                 </div>
                 <div>

@@ -13,7 +13,7 @@ import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSocket } from './redux/socketSlice'
 import { setOnlineUsers } from './redux/chatSlice'
-import { setLikeNotification } from './redux/rtnSlice'
+import { setFollowNotification, setLikeNotification } from './redux/rtnSlice'
 import ProtectedRoutes from './components/ProtectedRoutes'
 import EditProfile from './components/EditProfile'
 
@@ -39,6 +39,10 @@ function App() {
 
       socketio.on('notification', (notification) => {
         dispatch(setLikeNotification(notification));
+      })
+
+      socketio.on('follownotification',(follownotification)=>{
+        dispatch(setFollowNotification(follownotification));
       })
 
       return () => {
